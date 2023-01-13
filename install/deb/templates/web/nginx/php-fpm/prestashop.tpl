@@ -1,7 +1,8 @@
-#=======================================================================#
-# Default Web Domain Template                                           #
-# DO NOT MODIFY THIS FILE! CHANGES WILL BE LOST WHEN REBUILDING DOMAINS #
-#=======================================================================#
+#=========================================================================#
+# Default Web Domain Template                                             #
+# DO NOT MODIFY THIS FILE! CHANGES WILL BE LOST WHEN REBUILDING DOMAINS   #
+# https://docs.hestiacp.com/admin_docs/web.html#how-do-web-templates-work #
+#=========================================================================#
 
 server {
     listen      %ip%:%web_port%;
@@ -72,13 +73,13 @@ server {
         deny all;
 	return 404;
     }
-    
+
     # vendor in modules directory
     location ~ ^/modules/.*/vendor/ {
         deny all;
 	return 404;
     }
-    
+
     # Prevent exposing other sensitive files
     location ~ \.(yml|log|tpl|twig|sass)$ {
         deny all;
@@ -111,7 +112,7 @@ server {
 	    try_files $fastcgi_script_name /index.php$uri&$args =404;
 	    fastcgi_split_path_info ^(.+\.php)(/.+)$;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            
+
             fastcgi_pass %backend_lsnr%;
             fastcgi_index index.php;
             include /etc/nginx/fastcgi_params;

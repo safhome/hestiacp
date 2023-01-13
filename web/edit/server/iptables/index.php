@@ -1,10 +1,9 @@
 <?php
-error_reporting(NULL);
-$TAB = 'SERVER';
+$TAB = "SERVER";
 
 // Main include
-include($_SERVER['DOCUMENT_ROOT']."/inc/main.php");
+include $_SERVER["DOCUMENT_ROOT"] . "/inc/main.php";
 
 // Check user
 header("Location: /list/firewall");
-exit;
+exit();

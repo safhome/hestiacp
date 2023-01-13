@@ -1,7 +1,8 @@
-#=======================================================================#
-# Default Web Domain Template                                           #
-# DO NOT MODIFY THIS FILE! CHANGES WILL BE LOST WHEN REBUILDING DOMAINS #
-#=======================================================================#
+#=========================================================================#
+# Default Web Domain Template                                             #
+# DO NOT MODIFY THIS FILE! CHANGES WILL BE LOST WHEN REBUILDING DOMAINS   #
+# https://docs.hestiacp.com/admin_docs/web.html#how-do-web-templates-work #
+#=========================================================================#
 
 server {
     listen      %ip%:%web_port%;
@@ -11,7 +12,7 @@ server {
     access_log  /var/log/nginx/domains/%domain%.log combined;
     access_log  /var/log/nginx/domains/%domain%.bytes bytes;
     error_log   /var/log/nginx/domains/%domain%.error.log error;
-        
+
     include %home%/%user%/conf/web/%domain%/nginx.forcessl.conf*;
 
     location / {
@@ -22,8 +23,8 @@ server {
         alias   %home%/%user%/web/%domain%/document_errors/;
     }
 
-    location ~ /\.(?!well-known\/) { 
-       deny all; 
+    location ~ /\.(?!well-known\/) {
+       deny all;
        return 404;
     }
 

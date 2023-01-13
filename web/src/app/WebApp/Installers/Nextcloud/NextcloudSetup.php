@@ -4,56 +4,71 @@ namespace Hestia\WebApp\Installers\Nextcloud;
 
 use Hestia\WebApp\Installers\BaseSetup as BaseSetup;
 
-class NextcloudSetup extends BaseSetup
-{
-    protected $appInfo = [
-        'name' => 'Nextcloud',
-        'group' => 'cloud',
-        'enabled' => true,
-        'version' => '22.2.0',
-        'thumbnail' => 'nextcloud-thumb.png'
-    ];
+class NextcloudSetup extends BaseSetup {
+	protected $appInfo = [
+		"name" => "Nextcloud",
+		"group" => "cloud",
+		"enabled" => true,
+		"version" => "latest",
+		"thumbnail" => "nextcloud-thumb.png",
+	];
 
-    protected $appname = 'nextcloud';
+	protected $appname = "nextcloud";
 
-    protected $config = [
-        'form' => [
-            'username' => ['value'=>'admin'],
-            'password' => 'password'
-            ],
-        'database' => true,
-        'resources' => [
-            'archive'  => [ 'src' => 'https://download.nextcloud.com/server/releases/nextcloud-22.2.0.tar.bz2' ]
-        ],
-    ];
+	protected $config = [
+		"form" => [
+			"username" => ["value" => "admin"],
+			"password" => "password",
+		],
+		"database" => true,
+		"resources" => [
+			"archive" => ["src" => "https://download.nextcloud.com/server/releases/latest.tar.bz2"],
+		],
+		"server" => [
+			"nginx" => [
+				"template" => "owncloud",
+			],
+			"php" => [
+				"supported" => ["7.4", "8.0", "8.1"],
+			],
+		],
+	];
 
-    public function install(array $options = null): bool
-    {
-        parent::install($options);
+	public function install(array $options = null): bool {
+		parent::install($options);
+		parent::setup($options);
 
-        $this->appcontext->runUser('v-copy-fs-file', [$this->getDocRoot(".htaccess.txt"), $this->getDocRoot(".htaccess")]);
+		// install nextcloud
+		$php_version = $this->appcontext->getSupportedPHP(
+			$this->config["server"]["php"]["supported"],
+		);
 
-        // install nextcloud
-        $this->appcontext->runUser('v-run-cli-cmd', ['/usr/bin/php',
-            $this->getDocRoot('occ'),
-            'maintenance:install',
-            '--database mysql',
-            '--database-name '.$this->appcontext->user() . '_' .$options['database_name'],
-            '--database-user '.$this->appcontext->user() . '_' .$options['database_user'],
-            '--database-pass '.$options['database_password'],
-            '--admin-user '.$options['username'],
-            '--admin-pass '.$options['password']
-            ], $status);
+		$this->appcontext->runUser(
+			"v-run-cli-cmd",
+			[
+				"/usr/bin/php" . $options["php_version"],
+				$this->getDocRoot("occ"),
+				"maintenance:install",
+				"--database mysql",
+				"--database-name " . $this->appcontext->user() . "_" . $options["database_name"],
+				"--database-user " . $this->appcontext->user() . "_" . $options["database_user"],
+				"--database-pass " . $options["database_password"],
+				"--admin-user " . $options["username"],
+				"--admin-pass " . $options["password"],
+			],
+			$status,
+		);
 
-        $this->appcontext->runUser(
-            'v-run-cli-cmd',
-            ['/usr/bin/php',
-                $this->getDocRoot('occ'),
-                'config:system:set',
-                'trusted_domains 2 --value='.$this->domain
-            ],
-            $status2
-        );
-        return ($status->code === 0 && $status2->code === 0);
-    }
+		$this->appcontext->runUser(
+			"v-run-cli-cmd",
+			[
+				"/usr/bin/php" . $options["php_version"],
+				$this->getDocRoot("occ"),
+				"config:system:set",
+				"trusted_domains 2 --value=" . $this->domain,
+			],
+			$status,
+		);
+		return $status->code === 0;
+	}
 }
